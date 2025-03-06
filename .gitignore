@@ -132,6 +132,7 @@ wandb/
 *.pyc
 *.log
 ckpts
+examples/oc20/data
 examples/dataset
 examples/property_prediction/ckpts
 #examples/property_prediction/dataset
