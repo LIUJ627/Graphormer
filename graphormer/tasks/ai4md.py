@@ -46,6 +46,7 @@ class LMDBDataset:
         data = pickle.loads(self.env.begin().get(f"{idx}".encode()))
         return dict(
             pos=torch.as_tensor(data["pos"]).float(),
+            # force=torch.as_tensor(data["force"]).float(),
             pos_relaxed=torch.as_tensor(data["pos_relaxed"]).float(),
             cell=torch.as_tensor(data["cell"]).float().view(3, 3),
             atoms=torch.as_tensor(data["atomic_numbers"]).long(),
@@ -81,6 +82,7 @@ class PBCDataset:
         data = self.dataset[idx]
 
         pos = data["pos"]
+        # force = data["force"]
         pos_relaxed = data["pos_relaxed"]
         cell = data["cell"]
         atoms = data["atoms"]
@@ -90,6 +92,9 @@ class PBCDataset:
         expand_pos = (pos.unsqueeze(0).expand(self.n_cells, -1, -1) + offsets).view(
             -1, 3
         )
+        # expand_force = (force.unsqueeze(0).expand(self.n_cells, -1, -1) + offsets).view(
+        #     -1, 3
+        # )
         expand_pos_relaxed = (
             pos.unsqueeze(0).expand(self.n_cells, -1, -1) + offsets
         ).view(-1, 3)
@@ -100,6 +105,7 @@ class PBCDataset:
             self.n_cells
         )  # not copy ads
         used_expand_pos = expand_pos[used_mask]
+        used_expand_force = expand_force[used_mask]
         used_expand_pos_relaxed = expand_pos_relaxed[used_mask]
 
         used_expand_tags = tags.repeat(self.n_cells)[
@@ -107,6 +113,7 @@ class PBCDataset:
         ]  # original implementation use zeros, need to test
         return dict(
             pos=torch.cat([pos, used_expand_pos], dim=0),
+            # force=torch.cat([force, used_expand_pos], dim=0),
             atoms=torch.cat([atoms, atoms.repeat(self.n_cells)[used_mask]]),
             tags=torch.cat([tags, used_expand_tags]),
             real_mask=torch.cat(
@@ -251,13 +258,7 @@ class AI4MDTask(FairseqTask):
         assert split in [
             "train",
             "val_id",
-            "val_ood_ads",
-            "val_ood_cat",
-            "val_ood_both",
             "test_id",
-            "test_ood_ads",
-            "test_ood_cat",
-            "test_ood_both",
         ], "invalid split: {}!".format(split)
         print(" > Loading {} ...".format(split))
 
@@ -270,20 +271,24 @@ class AI4MDTask(FairseqTask):
         real_mask = KeywordDataset(pbc_dataset, "real_mask")
 
         pos = KeywordDataset(pbc_dataset, "pos")
+        # force = KeywordDataset(pbc_dataset, "force")
 
         relaxed_energy = KeywordDataset(pbc_dataset, "relaxed_energy", is_scalar=True)
+        relaxed_force = KeywordDataset(pbc_dataset, "relaxed_force")
         deltapos = KeywordDataset(pbc_dataset, "deltapos")
 
         dataset = NestedDictionaryDataset(
             {
                 "net_input": {
                     "pos": pos,
+                    # "force": force,
                     "atoms": atoms,
                     "tags": tags,
                     "real_mask": real_mask,
                 },
                 "targets": {
                     "relaxed_energy": relaxed_energy,
+                    "relaxed_force" : relaxed_force,
                     "deltapos": deltapos,
                 },
             },
