@@ -105,7 +105,7 @@ class PBCDataset:
             self.n_cells
         )  # not copy ads
         used_expand_pos = expand_pos[used_mask]
-        used_expand_force = expand_force[used_mask]
+        # used_expand_force = expand_force[used_mask]
         used_expand_pos_relaxed = expand_pos_relaxed[used_mask]
 
         used_expand_tags = tags.repeat(self.n_cells)[
@@ -288,7 +288,7 @@ class AI4MDTask(FairseqTask):
                 },
                 "targets": {
                     "relaxed_energy": relaxed_energy,
-                    "relaxed_force" : relaxed_force,
+                    # "relaxed_force" : relaxed_force,
                     "deltapos": deltapos,
                 },
             },

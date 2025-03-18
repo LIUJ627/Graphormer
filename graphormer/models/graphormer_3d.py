@@ -339,9 +339,9 @@ class Graphormer3D(BaseFairseqModel):
         self.energe_agg_factor: Callable[[Tensor], Tensor] = nn.Embedding(3, 1)
         nn.init.normal_(self.energe_agg_factor.weight, 0, 0.01)
 
-        K = self.args.num_kernel
+        K = self.args.num_kernel # 128 for the default setting
 
-        self.gbf: Callable[[Tensor, Tensor], Tensor] = GaussianLayer(K, self.edge_types)
+        self.gbf: Callable[[Tensor, Tensor], Tensor] = GaussianLayer(K, self.edge_types) # 64 * 64
         self.bias_proj: Callable[[Tensor], Tensor] = NonLinear(
             K, self.args.attention_heads
         )

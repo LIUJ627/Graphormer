@@ -19,8 +19,9 @@ requests==2.28.1 six==1.16.0 torch-geometric==1.7.2 tqdm==4.64.0 tzdata==2022.1 
 protobuf==3.20.1 littleutils==0.2.2 ogb==1.3.2 outdated==0.2.1 -i https://pypi.mirrors.ustc.edu.cn/simple/
 #rdflib==6.2.0
 pip install torch-scatter==2.0.9 torch-sparse==0.6.12 -f https://pytorch-geometric.com/whl/torch-1.9.1+cu111.html
-pip install torch-geometric==1.7.2 tensorboardX==2.4.1 ogb==1.3.2 rdkit-pypi==2021.9.3
+pip install torch-geometric==1.7.2 ogb==1.3.2 rdkit-pypi==2021.9.3
 pip install dgl==0.7.2 -f https://data.dgl.ai/wheels/repo.html
+# pip install tensorboardX==2.1
 
 pip install PyYAML==6.0 antlr4-python3-runtime==4.8 bitarray==3.0.0 cffi==1.17.1 \
 colorama==0.4.6 cython==3.0.11 hydra-core==1.0.7  lxml==5.3.0 omegaconf==2.0.6 \
