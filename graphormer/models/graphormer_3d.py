@@ -365,16 +365,22 @@ class Graphormer3D(BaseFairseqModel):
         edge_type = atoms.view(n_graph, n_node, 1) * self.atom_types + atoms.view(
             n_graph, 1, n_node
         )
-
+        
+        max_distance = 10.0  
+        distance_mask = dist > max_distance
+        dist = dist.masked_fill(distance_mask, 0.0)
+        edge_type = edge_type.masked_fill(distance_mask, 0.0)
+        
         gbf_feature = self.gbf(dist, edge_type)
         edge_features = gbf_feature.masked_fill(
             padding_mask.unsqueeze(1).unsqueeze(-1), 0.0
         )
-
+        
+        edge_features = self.edge_proj(edge_features.sum(dim=-2))
         graph_node_feature = (
             self.tag_encoder(tags)
             + self.atom_encoder(atoms)
-            + self.edge_proj(edge_features.sum(dim=-2))
+            + edge_features
         )
 
         # ===== MAIN MODEL =====
@@ -383,7 +389,15 @@ class Graphormer3D(BaseFairseqModel):
         )
         output = output.transpose(0, 1).contiguous()
 
-        graph_attn_bias = self.bias_proj(gbf_feature).permute(0, 3, 1, 2).contiguous()
+        print("point9")
+        # NonLinear Layer出现了问题，可能是形状没有对齐的缘故
+        graph_attn_bias = self.bias_proj(gbf_feature)
+        print("point9.5")
+        graph_attn_bias = graph_attn_bias.permute(0, 3, 1, 2)
+        print("point10")
+        graph_attn_bias = graph_attn_bias.contiguous()                                  
+        print("point11")
+        # graph_attn_bias = self.bias_proj(gbf_feature).permute(0, 3, 1, 2).contiguous()
         graph_attn_bias.masked_fill_(
             padding_mask.unsqueeze(1).unsqueeze(2), float("-inf")
         )
