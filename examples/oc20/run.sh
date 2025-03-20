@@ -9,4 +9,4 @@ fairseq-train --user-dir ~/Graphormer/fairseq/examples/graphormer  \
    --embed-dim 768 --ffn-embed-dim 768 --attention-heads 48 \
    --max-update 100 --log-interval 10 --log-format simple \
    --save-interval-updates 100 --validate-interval-updates 250 --keep-interval-updates 100 --no-epoch-checkpoints  \
-   --save-dir ./ckpt --layers 12 --blocks 4 --required-batch-size-multiple 1  --node-loss-weight 15 --num-kernel 8
+   --save-dir ./ckpt --layers 12 --blocks 4 --required-batch-size-multiple 1  --node-loss-weight 15 --num-kernel 8 --dist-mask 8
